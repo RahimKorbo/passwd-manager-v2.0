@@ -2,15 +2,16 @@ import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
 import { register } from "./Constants";
+import Spinner from 'react-bootstrap/Spinner';
+import loading from'../assets/loading.gif';
 
 export default class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
       navigate: false,
-      // username: "",
-      // password: "",
       fields: {},
+      isLoading: false,
       errors: {}
     };
     this.handleChange = this.handleChange.bind(this);
@@ -35,29 +36,34 @@ export default class Register extends Component {
 
   submitLoginForm(e) {
     e.preventDefault();
-    if (this.validateForm()) {
-      let fields = this.state.fields;
+    //alert("Form submitted---->", this.validateForm());
+    let fields = this.state.fields;
 
-      if (!fields["username"] && !fields["password"]) {
-        fields["username"] = "";
-        fields["password"] = "";
-      }
+    // if (this.validateForm()) {
 
-      this.setState({ fields: fields });
-      //alert("Form submitted");
-      this.authenticate();
-    }
+    //   if (!fields["username"] && !fields["password"] && !fields["username"] && !fields["password"]) {
+    //     fields["username"] = "";
+    //     fields["password"] = "";
+    //   }
+
+
+    // }
+
+    this.setState({ fields: fields });
+    //alert("Form submitted");
+    this.authenticate();
 
   }
 
   validateForm() {
 
+    let formIsValid = true;
     let fields = this.state.fields;
     let errors = {};
-    let formIsValid = true;
 
-    //alert("UserName:::"+fields.username);
-    //alert("Password:::"+fields.password);
+
+    // alert("UserName:::" + fields.userName);
+    // alert("Password:::" + fields.userPass);
 
 
     if (!fields["username"]) {
@@ -78,9 +84,9 @@ export default class Register extends Component {
     }
 
     if (!fields["userpin"]) {
-        formIsValid = false;
-        errors["userpin"] = "*Please enter your userpin.";
-      }
+      formIsValid = false;
+      errors["userpin"] = "*Please enter your userpin.";
+    }
 
     this.setState({
       errors: errors
@@ -91,25 +97,43 @@ export default class Register extends Component {
   }
 
   authenticate = () => {
+    // firstname
+    // Laste
+    // email
+    // username
+    // userpass
+
+    // userpin 4-6
+
+    this.setState({ isLoading: true });
+    
     const authJson = {
-      username: this.state.fields.username,
-      password: this.state.fields.password,
-      userpin: this.state.fields.userpin,
+
+      firstName: this.state.fields.firstName,
+      lastName: this.state.fields.lastName,
+      emailId: this.state.fields.emailId,
+      userName: this.state.fields.userName,
+      userPass: this.state.fields.userPass,
+      userPin: this.state.fields.userPin,
     };
 
-    console.log(authJson)
+    console.log("data gone to api-", authJson);
+   
+    // alert("Spinner chalu--"+this.state.isLoading);
     Axios.request({
       method: "POST",
       data: authJson,
       url: register
     })
       .then((response) => {
+
         alert("User Authentication Successful.")
+        
         // localStorage.setItem("username",this.state.fields.username)
         // localStorage.setItem("token",response.data.jwttoken);
         // localStorage.setItem("logintime",response.data.loginTime);
-       
-        this.setState({ navigate: true });
+
+        this.setState({ navigate: true, isLoading: false });
       })
       .catch((err) => {
         console.log(err);
@@ -122,8 +146,16 @@ export default class Register extends Component {
     const { navigate } = this.state;
 
     // here is the important part
+
+    // firstname
+    // Laste
+    // email
+    // username
+    // userpass
+    // userpin 4-6
+
     if (navigate) {
-      return <Redirect to="/login" push={true} />;
+      return <Redirect to="/" push={true} />;
     }
 
     return (
@@ -133,48 +165,77 @@ export default class Register extends Component {
       <div>
         <div className="login">
           <h1>Password Manager</h1>
-         
-            <p><input
-              id="username"
-              name="username"
-              type="text"
-              placeholder="username"
-              onKeyUp={this.handleChange}
-              required
-              maxLength="8"
-            /></p>
-            <p> <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="password"
-              onKeyUp={this.handleChange}
-              required
-              maxLength="10"
-              minLength="5"
-            /></p>
-             <p><input
-              id="userpin"
-              name="userpin"
-              type="text"
-              placeholder="userpin"
-              onKeyUp={this.handleChange}
-              required
-              maxLength="8"
-            /></p>
-            
-            <p className="submit"> <button
-              role="button"
-              className="button"
-              //onClick={this.authenticate}
-              onClick={this.submitLoginForm}
-            >
-              Login
+          <h1>Register Here</h1>
+          <p><input
+            id="firstName"
+            name="firstName"
+            type="text"
+            placeholder="firstName"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="8"
+          /></p>
+          <p><input
+            id="lastName"
+            name="lastName"
+            type="text"
+            placeholder="lastName"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="8"
+          /></p>
+          <p><input
+            id="emailId"
+            name="emailId"
+            type="text"
+            placeholder="email"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="8"
+          /></p>
+
+          <p><input
+            id="userName"
+            name="userName"
+            type="text"
+            placeholder="userName"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="8"
+          /></p>
+          <p><input
+            id="userPass"
+            name="userPass"
+            type="text"
+            placeholder="userPass"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="8"
+          /></p>
+          <p><input
+            id="userPin"
+            name="userPin"
+            type="text"
+            placeholder="userPin"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="8"
+          /></p>
+
+          <p className="submit"> <button
+            role="button"
+            className="button"
+            //onClick={this.authenticate}
+            onClick={this.submitLoginForm}
+          >
+            Register
                         </button></p>
-          
+
+                        {this.state.isLoading && <img src={loading} />  }
         </div>
 
 
+       
 
       </div>
     );

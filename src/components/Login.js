@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
 import { loginURL } from "./Constants";
+import { Spinner } from "react-bootstrap";
+import loading from'../assets/loading.gif';
 
 export default class Login extends Component {
   constructor(props) {
@@ -11,6 +13,7 @@ export default class Login extends Component {
       // username: "",
       // password: "",
       fields: {},
+      isLoading: false,
       errors: {}
     };
     this.handleChange = this.handleChange.bind(this);
@@ -87,11 +90,14 @@ export default class Login extends Component {
   }
 
   authenticate = () => {
+
     const authJson = {
       username: this.state.fields.username,
       password: this.state.fields.password,
     };
 
+    this.setState({ isLoading: true });
+    //alert("Spinner chalu--"+this.state.isLoading+" ,"+this.setState({ isLoading: true }));
     console.log(authJson)
     Axios.request({
       method: "POST",
@@ -106,7 +112,7 @@ export default class Login extends Component {
         sessionStorage.setItem("username", this.state.fields.username)
         sessionStorage.setItem("token", response.data.jwttoken);
         sessionStorage.setItem("logintime", response.data.loginTime);
-        this.setState({ navigate: true });
+        this.setState({ navigate: true , isLoading: false });
       })
       .catch((err) => {
         console.log(err);
@@ -161,8 +167,12 @@ export default class Login extends Component {
             >
               Login
                         </button></p>
+
+
+        {this.state.isLoading && <img src={loading} />  }
           
         </div>
+
 
 
 

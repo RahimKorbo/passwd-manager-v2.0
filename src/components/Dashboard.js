@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
     Grid,
     GridColumn as Column,
@@ -13,11 +14,32 @@ import './Login.css';
 import { TestData } from './TestData.jsx';
 import { addRecord, getRecord } from "./PasswordDataCall.js";
 
+import ReactDataGrid from 'react-data-grid';
+
+
+const columns = [
+    { key: 'id', name: 'ID' },
+    { key: 'title', name: 'Title' },
+    { key: 'count', name: 'Count' } ];
+
+    const rows = [{id: 0, title: 'row1', count: 20}, {id: 1, title: 'row1', count: 40}, {id: 2, title: 'row1', count: 60}];
+
+
 export default class Dashboard extends React.Component {
     editField = "inEdit";
     state = {
         data: [],
-        userName: "rahim"
+        username: "",
+        columns: [
+            { key: 'id', name: 'ID' },
+            { key: 'title', name: 'Title' },
+            { key: 'count', name: 'Count' }
+        ],
+        rows: [
+            { id: 0, title: 'row1', count: 20 },
+            { id: 1, title: 'row1', count: 40 },
+            { id: 2, title: 'row1', count: 60 }
+        ]
     };
 
     // componentDidMount() {
@@ -28,20 +50,23 @@ export default class Dashboard extends React.Component {
 
     getData = () => {
         const json = { userName: this.state.userName }
-         getRecord(json)
-             .then(res => {
-                 if (res.status == 200) {
-                     console.log("Getting response from API--",res.data)
-                     this.setState({ data: res.data })
-                 }
-                 else {
-                     console.log("Error")
-                 }
-             })
+        getRecord(json)
+            .then(res => {
+                if (res.status == 200) {
+                    console.log("Getting response from API--", res.data)
+                    this.setState({ data: res.data })
+                }
+                else {
+                    console.log("Error")
+                }
+            })
     }
 
     componentDidMount() {
-        console.log(this.state.userName)
+        console.log(this.state.username)
+        this.setState({
+            username: sessionStorage.getItem("username"),
+        })
         this.getData();
     }
 
@@ -78,29 +103,29 @@ export default class Dashboard extends React.Component {
         const data = [...this.state.data];
 
         // dataItem.inEdit = undefined;
-         dataItem.id = this.generateId(data);
+        dataItem.id = this.generateId(data);
 
-         data.unshift(dataItem);
-         this.setState({
-             data: [...this.state.data]
-         });
-         dataItem.createdBy = sessionStorage.getItem("username")
+        data.unshift(dataItem);
+        this.setState({
+            data: [...this.state.data]
+        });
+        dataItem.createdBy = sessionStorage.getItem("username")
 
-         console.log(dataItem)
-         addRecord(dataItem).then(res => {
-             if (res.status === 200) {
-                 alert(res.data)
-             }
-             else {
-                 alert("Error Occurred.")
-             }
-         })
-             .catch(err => {
-                 alert(err);
-                 this.setState({
-                     redirect: true
-                 })
-             })
+        console.log(dataItem)
+        addRecord(dataItem).then(res => {
+            if (res.status === 200) {
+                alert(res.data)
+            }
+            else {
+                alert("Error Occurred.")
+            }
+        })
+            .catch(err => {
+                alert(err);
+                this.setState({
+                    redirect: true
+                })
+            })
     };
 
     update = dataItem => {
@@ -148,7 +173,7 @@ export default class Dashboard extends React.Component {
     addNew = () => {
         const newDataItem = { inEdit: true };
         const dataItem = { inEdit: true };
-        
+
         dataItem.inEdit = true;
 
         //const data = insertItem(dataItem);
@@ -161,79 +186,118 @@ export default class Dashboard extends React.Component {
         const data = [...this.state.data];
 
         // dataItem.inEdit = undefined;
-         dataItem.id = this.generateId(data);
+        dataItem.id = this.generateId(data);
 
-         data.unshift(dataItem);
-         this.setState({
-             data: [...this.state.data]
-         });
-         dataItem.createdBy = sessionStorage.getItem("username")
+        data.unshift(dataItem);
+        this.setState({
+            data: [...this.state.data]
+        });
+        dataItem.createdBy = sessionStorage.getItem("username")
 
-         console.log(dataItem)
-         addRecord(dataItem).then(res => {
-             if (res.status === 200) {
-                 alert(res.data)
-                 this.setState({
+        console.log(dataItem)
+        addRecord(dataItem).then(res => {
+            if (res.status === 200) {
+                alert(res.data)
+                this.setState({
                     data: [newDataItem, ...this.state.data]
                 });
-             }
-             else {
-                 alert("Error Occurred.")
-             }
-         })
-             .catch(err => {
-                 alert(err);
-                 this.setState({
-                     redirect: true
-                 })
-             })
+            }
+            else {
+                alert("Error Occurred.")
+            }
+        })
+            .catch(err => {
+                alert(err);
+                this.setState({
+                    redirect: true
+                })
+            })
 
-        
+
     };
 
+    onGridRowsUpdated = ({ fromRow, toRow, updated }) => {
+        this.setState(state => {
+            const rows = state.rows.slice();
+            for (let i = fromRow; i <= toRow; i++) {
+                rows[i] = { ...rows[i], ...updated };
+            }
+            return { rows };
+        });
+        console.log('')
+    };
+    
+
     render() {
+
+        
+        const { data } = this.state.data;
+
         return (
             <div className="Login">
-            <Grid
-                style={{ height: "620px" , padding: "120px" }}
-                data={this.state.data}
-                onItemChange={this.itemChange}
-                editField={this.editField}
-            >
-                <GridToolbar>
-                    <button
-                        title="Add new"
-                        className="k-button k-primary"
-                        onClick={this.addNew}
-                    >
-                        Add new
+               
+                <div>
+                <h3>Welcome, {this.state.username}</h3>
+                <button
+                    role="button"
+                    className="button"
+
+                >
+                    <Link to="/" onClick={() => { sessionStorage.clear() }} >
+                        <span> Logout</span>
+                    </Link>
+                </button>
+
+                <ReactDataGrid
+                            columns={this.state.columns}
+                            rowGetter={i => this.state.rows[i]}
+                            rowsCount={3}
+                            minHeight={150}
+                        />
+                <Grid
+                    style={{ height: "620px", padding: "120px" }}
+                    data={this.state.data}
+                    onItemChange={this.itemChange}
+                    editField={this.editField}
+                >
+                    <GridToolbar>
+                        <button
+                            title="Add new"
+                            className="k-button k-primary"
+                            onClick={this.addNew}
+                        >
+                            Add new
           </button>
-                </GridToolbar>
-                <Column field="pwdId" title="Password Id" width="90px" editable={false} />
-                <Column field="siteName" title="Site Name" width="200px" />
-                <Column
-                    field="siteUserName"
-                    title="Site UserName"
-                    width="150px"
-                />
-                <Column
-                    field="sitePwd"
-                    title="Site Password"
-                    width="150px"
-                />
-              
-                <Column cell={this.CommandCell} width="180px" />
-            </Grid>
+                    </GridToolbar>
+                    <Column field="pwdId" title="Password Id" width="90px" editable={false} />
+                    <Column field="siteName" title="Site Name" width="200px" />
+                    <Column
+                        field="siteUserName"
+                        title="Site UserName"
+                        width="150px"
+                    />
+                    <Column
+                        field="sitePwd"
+                        title="Site Password"
+                        width="150px"
+                    />
+
+                    <Column cell={this.CommandCell} width="180px" />
+                </Grid>
+
+                </div>
+
+                
             </div>
         );
     }
 
 
-generateId = data => data.reduce((acc, current) => Math.max(acc, current.id), 0) + 1;
-removeItem(data, item) {
-    let index = data.findIndex(p => p === item || item.id && p.id === item.id);
-    if (index >= 0) {
-        data.splice(index, 1);
+    generateId = data => data.reduce((acc, current) => Math.max(acc, current.id), 0) + 1;
+    removeItem(data, item) {
+        let index = data.findIndex(p => p === item || item.id && p.id === item.id);
+        if (index >= 0) {
+            data.splice(index, 1);
+        }
     }
-}
 }
