@@ -3,7 +3,8 @@ import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
 import { loginURL } from "./Constants";
 import { Spinner } from "react-bootstrap";
-import loading from'../assets/loading.gif';
+import loading from '../assets/loading.gif';
+import './Login.css'
 
 export default class Login extends Component {
   constructor(props) {
@@ -97,8 +98,9 @@ export default class Login extends Component {
     };
 
     this.setState({ isLoading: true });
+
     //alert("Spinner chalu--"+this.state.isLoading+" ,"+this.setState({ isLoading: true }));
-    console.log(authJson)
+    console.log(authJson.username)
     Axios.request({
       method: "POST",
       data: authJson,
@@ -106,13 +108,13 @@ export default class Login extends Component {
     })
       .then((response) => {
         alert("User Authentication Successful.")
-        // localStorage.setItem("username",this.state.fields.username)
+        localStorage.setItem("username", authJson.username)
         // localStorage.setItem("token",response.data.jwttoken);
         // localStorage.setItem("logintime",response.data.loginTime);
         sessionStorage.setItem("username", this.state.fields.username)
-        sessionStorage.setItem("token", response.data.jwttoken);
+        sessionStorage.setItem("authUser", authJson.username);
         sessionStorage.setItem("logintime", response.data.loginTime);
-        this.setState({ navigate: true , isLoading: false });
+        this.setState({ navigate: true, isLoading: false });
       })
       .catch((err) => {
         console.log(err);
@@ -126,7 +128,9 @@ export default class Login extends Component {
 
     // here is the important part
     if (navigate) {
-      return <Redirect to="/dashboard" push={true} />;
+      // return <Redirect to="/dashboard" push={true} />;
+
+      return <Redirect to={{ pathname: '/dashboard',state: { id: this.state.fields.username } }} push={true} />
     }
 
     return (
@@ -136,41 +140,41 @@ export default class Login extends Component {
       <div>
         <div className="login">
           <h1>Password Manager</h1>
-         
-            <p><input
-              id="username"
-              name="username"
-              type="text"
-              placeholder="username"
-              onKeyUp={this.handleChange}
-              required
-              maxLength="8"
-            /></p>
-            <p> <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="password"
-              onKeyUp={this.handleChange}
-              required
-              maxLength="10"
-              minLength="5"
-            /></p>
-            <p className="remember_me">
-              <Link to="/register" className="button secondary">New User? Register Here</Link>
-            </p>
-            <p className="submit"> <button
-              role="button"
-              className="button"
-              //onClick={this.authenticate}
-              onClick={this.submitLoginForm}
-            >
-              Login
+
+          <p><input
+            id="username"
+            name="username"
+            type="text"
+            placeholder="username"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="8"
+          /></p>
+          <p> <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="password"
+            onKeyUp={this.handleChange}
+            required
+            maxLength="10"
+            minLength="5"
+          /></p>
+          <p className="remember_me">
+            <Link to="/register" className="button secondary">New User? Register Here</Link>
+          </p>
+          <p className="submit"> <button
+            role="button"
+            className="button"
+            //onClick={this.authenticate}
+            onClick={this.submitLoginForm}
+          >
+            Login
                         </button></p>
 
 
-        {this.state.isLoading && <img src={loading} />  }
-          
+          {this.state.isLoading && <img src={loading} />}
+
         </div>
 
 

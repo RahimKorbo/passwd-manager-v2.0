@@ -13,7 +13,8 @@ export function getRecord(json){
             method:"POST",
             url : getRecordURL,
             data : json,
-            headers: header
+            headers: header,
+            credentials: 'include'
         }
     ).then(res=>res)
 }

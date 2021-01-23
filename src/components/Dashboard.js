@@ -1,60 +1,38 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Link, Redirect } from "react-router-dom";
-import {
-    Grid,
-    GridColumn as Column,
-    GridToolbar
-} from "@progress/kendo-react-grid";
-
-import { MyCommandCell } from "./MyCommandCell.js";
-import { insertItem, getItems, updateItem, deleteItem } from "./service.js";
-import '@progress/kendo-theme-default/dist/all.css';
-import './Login.css';
-import { TestData } from './TestData.jsx';
 import { addRecord, getRecord } from "./PasswordDataCall.js";
-
-import ReactDataGrid from 'react-data-grid';
-
-
-const columns = [
-    { key: 'id', name: 'ID' },
-    { key: 'title', name: 'Title' },
-    { key: 'count', name: 'Count' } ];
-
-    const rows = [{id: 0, title: 'row1', count: 20}, {id: 1, title: 'row1', count: 40}, {id: 2, title: 'row1', count: 60}];
 
 
 export default class Dashboard extends React.Component {
-    editField = "inEdit";
-    state = {
-        data: [],
-        username: "",
-        columns: [
-            { key: 'id', name: 'ID' },
-            { key: 'title', name: 'Title' },
-            { key: 'count', name: 'Count' }
-        ],
-        rows: [
-            { id: 0, title: 'row1', count: 20 },
-            { id: 1, title: 'row1', count: 40 },
-            { id: 2, title: 'row1', count: 60 }
-        ]
-    };
 
-    // componentDidMount() {
-    //     this.setState({
-    //         data: getItems()
-    //     });
-    // }
+    constructor(props) {
+        super(props);
+        console.log("props value--", props.location.state);
+        this.state = {
+            navigate: false,
+            // username: "",
+            // password: "",
+            fields: {},
+            isLoading: false,
+            errors: {},
+            rows: [],
+            userName: props.location.state.id,
+            authUser: ""
+        };
+
+    }
+
 
     getData = () => {
         const json = { userName: this.state.userName }
+        console.log("username in session::", json);
+
         getRecord(json)
             .then(res => {
                 if (res.status == 200) {
                     console.log("Getting response from API--", res.data)
-                    this.setState({ data: res.data })
+                    this.setState({ rows: res.data })
                 }
                 else {
                     console.log("Error")
@@ -63,241 +41,101 @@ export default class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.state.username)
+
         this.setState({
-            username: sessionStorage.getItem("username"),
+            userName: localStorage.getItem("username"),
+            authUser: sessionStorage.getItem("authUser")
         })
+        console.log("Session Value-->" + this.state.userName)
+        console.log("Session2 Value-->" + this.state.authUser)
         this.getData();
     }
 
+    handleItemChanged(i, event) {
+        var items = this.state.rows;
 
-    CommandCell = props => (
-        <MyCommandCell
-            {...props}
-            edit={this.enterEdit}
-            remove={this.remove}
-            add={this.add}
-            discard={this.discard}
-            update={this.update}
-            cancel={this.cancel}
-            editField={this.editField}
-        />
-    );
+        alert("Edit Button---" + event.target.value);
+        items[i] = event.target.value;
 
-    // modify the data in the store, db etc
-    remove = dataItem => {
-        const data = deleteItem(dataItem);
-        this.setState({ data });
-    };
-
-    add = dataItem => {
-        dataItem.inEdit = true;
-
-        //const data = insertItem(dataItem);
-        // this.setState({
-        //     data: data
-        // });
-
-
-
-        const data = [...this.state.data];
-
-        // dataItem.inEdit = undefined;
-        dataItem.id = this.generateId(data);
-
-        data.unshift(dataItem);
         this.setState({
-            data: [...this.state.data]
+            rows: items
         });
-        dataItem.createdBy = sessionStorage.getItem("username")
+    }
+    handleItemDeleted(i) {
+        var items = this.state.rows;
 
-        console.log(dataItem)
-        addRecord(dataItem).then(res => {
-            if (res.status === 200) {
-                alert(res.data)
-            }
-            else {
-                alert("Error Occurred.")
-            }
-        })
-            .catch(err => {
-                alert(err);
-                this.setState({
-                    redirect: true
-                })
-            })
-    };
+        items.splice(i, 1);
 
-    update = dataItem => {
-        dataItem.inEdit = false;
-        const data = updateItem(dataItem);
-        this.setState({ data });
-    };
-
-    // Local state operations
-    discard = dataItem => {
-        const data = [...this.state.data];
-        data.splice(0, 1)
-        this.setState({ data });
-    };
-
-    cancel = dataItem => {
-        const originalItem = getItems().find(
-            p => p.siteId === dataItem.siteId
-        );
-        const data = this.state.data.map(item =>
-            item.siteId === originalItem.siteId ? originalItem : item
-        );
-
-        this.setState({ data });
-    };
-
-    enterEdit = dataItem => {
         this.setState({
-            data: this.state.data.map(item =>
-                item.siteId === dataItem.siteId ? { ...item, inEdit: true } : item
-            )
+            rows: items
         });
-    };
+    }
 
-    itemChange = event => {
-        const data = this.state.data.map(item =>
-            item.siteId === event.dataItem.siteId
-                ? { ...item, [event.field]: event.value }
-                : item
-        );
-
-        this.setState({ data });
-    };
-
-    addNew = () => {
-        const newDataItem = { inEdit: true };
-        const dataItem = { inEdit: true };
-
-        dataItem.inEdit = true;
-
-        //const data = insertItem(dataItem);
-        // this.setState({
-        //     data: data
-        // });
+    handleClick() {
+        var items = this.state.rows;
+        console.log("Data on Add Data BUtton:" + items);
 
 
-
-        const data = [...this.state.data];
-
-        // dataItem.inEdit = undefined;
-        dataItem.id = this.generateId(data);
-
-        data.unshift(dataItem);
-        this.setState({
-            data: [...this.state.data]
-        });
-        dataItem.createdBy = sessionStorage.getItem("username")
-
-        console.log(dataItem)
-        addRecord(dataItem).then(res => {
-            if (res.status === 200) {
-                alert(res.data)
-                this.setState({
-                    data: [newDataItem, ...this.state.data]
-                });
-            }
-            else {
-                alert("Error Occurred.")
-            }
-        })
-            .catch(err => {
-                alert(err);
-                this.setState({
-                    redirect: true
-                })
-            })
-
-
-    };
-
-    onGridRowsUpdated = ({ fromRow, toRow, updated }) => {
-        this.setState(state => {
-            const rows = state.rows.slice();
-            for (let i = fromRow; i <= toRow; i++) {
-                rows[i] = { ...rows[i], ...updated };
-            }
-            return { rows };
-        });
-        console.log('')
-    };
-    
-
+    }
     render() {
 
-        
-        const { data } = this.state.data;
 
+        const { rows } = this.state.rows;
+        var context = this;
         return (
             <div className="Login">
-               
+
                 <div>
-                <h3>Welcome, {this.state.username}</h3>
-                <button
-                    role="button"
-                    className="button"
+                    <h3>Welcome, {this.state.userName}</h3>
+                    <button
+                        role="button"
+                        className="button"
 
-                >
-                    <Link to="/" onClick={() => { sessionStorage.clear() }} >
-                        <span> Logout</span>
-                    </Link>
-                </button>
-
-                <ReactDataGrid
-                            columns={this.state.columns}
-                            rowGetter={i => this.state.rows[i]}
-                            rowsCount={3}
-                            minHeight={150}
-                        />
-                <Grid
-                    style={{ height: "620px", padding: "120px" }}
-                    data={this.state.data}
-                    onItemChange={this.itemChange}
-                    editField={this.editField}
-                >
-                    <GridToolbar>
-                        <button
-                            title="Add new"
-                            className="k-button k-primary"
-                            onClick={this.addNew}
-                        >
-                            Add new
-          </button>
-                    </GridToolbar>
-                    <Column field="pwdId" title="Password Id" width="90px" editable={false} />
-                    <Column field="siteName" title="Site Name" width="200px" />
-                    <Column
-                        field="siteUserName"
-                        title="Site UserName"
-                        width="150px"
-                    />
-                    <Column
-                        field="sitePwd"
-                        title="Site Password"
-                        width="150px"
-                    />
-
-                    <Column cell={this.CommandCell} width="180px" />
-                </Grid>
-
+                    >
+                        <Link to="/" onClick={() => { sessionStorage.clear() }} >
+                            <span> Logout</span>
+                        </Link>
+                    </button>
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <button> <Link to={{ pathname: "/newRecord", state: { id: this.state.userName } }}>Add Record</Link></button>
+                            </tr>
+                            <tr>
+                                <th>Password Id</th>
+                                <th>Site name</th>
+                                <th>Site password</th>
+                                <th>Site Username</th>
+                                <th>Button</th>
+                                <th>Button</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.rows.map((listValue, index) => {
+                                return (
+                                    <tr key={index}>
+                                        <td>{listValue.pwdId}</td>
+                                        <td>{listValue.siteName}</td>
+                                        <td>{listValue.sitePwd}</td>
+                                        <td>{listValue.siteUserName}</td>
+                                        <td>
+                                            <button> <Link to={{ pathname: "/editRecord", state: { item: listValue , id: this.state.userName} }}>Edit Record</Link></button>
+                                        </td>
+                                        <td>
+                                            <button onClick={context.handleItemDeleted.bind(context, index)}> Delete </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
                 </div>
 
-                
+
             </div>
         );
     }
 
 
-    generateId = data => data.reduce((acc, current) => Math.max(acc, current.id), 0) + 1;
-    removeItem(data, item) {
-        let index = data.findIndex(p => p === item || item.id && p.id === item.id);
-        if (index >= 0) {
-            data.splice(index, 1);
-        }
-    }
+
 }
