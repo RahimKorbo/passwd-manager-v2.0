@@ -4,7 +4,9 @@ import Axios from "axios";
 import { loginURL } from "./Constants";
 import { Spinner } from "react-bootstrap";
 import loading from '../assets/loading.gif';
-import './Login.css'
+//import './Login.css'
+import './LoginPageTest.css';
+import PageTitle from "./PageTitle";
 
 export default class Login extends Component {
   constructor(props) {
@@ -15,7 +17,8 @@ export default class Login extends Component {
       // password: "",
       fields: {},
       isLoading: false,
-      errors: {}
+      errors: {},
+      isTitleShow:true
     };
     this.handleChange = this.handleChange.bind(this);
     this.submitLoginForm = this.submitLoginForm.bind(this);
@@ -97,7 +100,7 @@ export default class Login extends Component {
       password: this.state.fields.password,
     };
 
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true,isTitleShow: false });
 
     //alert("Spinner chalu--"+this.state.isLoading+" ,"+this.setState({ isLoading: true }));
     console.log(authJson.username)
@@ -114,7 +117,7 @@ export default class Login extends Component {
         sessionStorage.setItem("username", this.state.fields.username)
         sessionStorage.setItem("authUser", authJson.username);
         sessionStorage.setItem("logintime", response.data.loginTime);
-        this.setState({ navigate: true, isLoading: false });
+        this.setState({ navigate: true, isLoading: false, isTitleShow: true });
       })
       .catch((err) => {
         console.log(err);
@@ -130,57 +133,74 @@ export default class Login extends Component {
     if (navigate) {
       // return <Redirect to="/dashboard" push={true} />;
 
-      return <Redirect to={{ pathname: '/dashboard',state: { id: this.state.fields.username } }} push={true} />
+      return <Redirect to={{ pathname: '/dashboard', state: { id: this.state.fields.username } }} push={true} />
     }
 
     return (
 
 
+      <>
+       {this.state.isTitleShow && <PageTitle/> }
+        
+        <div className="center">
 
-      <div>
-        <div className="login">
-          <h1>Password Manager</h1>
-
-          <p><input
-            id="username"
-            name="username"
-            type="text"
-            placeholder="username"
-            onKeyUp={this.handleChange}
-            required
-            maxLength="8"
-          /></p>
-          <p> <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="password"
-            onKeyUp={this.handleChange}
-            required
-            maxLength="10"
-            minLength="5"
-          /></p>
-          <p className="remember_me">
-            <Link to="/register" className="button secondary">New User? Register Here</Link>
-          </p>
-          <p className="submit"> <button
-            role="button"
-            className="button"
-            //onClick={this.authenticate}
-            onClick={this.submitLoginForm}
-          >
-            Login
-                        </button></p>
+          <h1>Login</h1>
+          {/* <h1>Log in</h1>  */}
+          <form>
+            <div className="txt_field">
 
 
+              <input
+                id="username"
+                name="username"
+                type="text"
+
+                onKeyUp={this.handleChange}
+                required="required"
+                maxLength="8"
+              />
+              <span></span>
+              <label> Your email or username </label>
+              {/* <label> Your email or username </label> */}
+            </div>
+            <div className="txt_field">
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+
+                onKeyUp={this.handleChange}
+                required="required"
+                maxLength="10"
+                minLength="5"
+              />
+              <label> Your password </label>
+            </div>
+            <div className="sigup_link">
+              <Link to="/register" className="to_register">New User? Register Here</Link>
+            </div>
+
+            <button
+              id="button"
+              className="button"
+              //onClick={this.authenticate}
+              onClick={this.submitLoginForm}
+            >
+              Login
+                        </button>
+
+
+
+
+          </form>
           {this.state.isLoading && <img src={loading} />}
-
         </div>
 
+       
+      </>
 
 
-
-      </div>
     );
   }
 }

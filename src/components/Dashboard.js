@@ -83,56 +83,72 @@ export default class Dashboard extends React.Component {
         const { rows } = this.state.rows;
         var context = this;
         return (
-            <div className="Login">
+            <>
 
-                <div>
-                    <h3>Welcome, {this.state.userName}</h3>
-                    <button
-                        role="button"
-                        className="button"
-
-                    >
-                        <Link to="/" onClick={() => { sessionStorage.clear() }} >
-                            <span> Logout</span>
-                        </Link>
-                    </button>
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <button> <Link to={{ pathname: "/newRecord", state: { id: this.state.userName } }}>Add Record</Link></button>
-                            </tr>
-                            <tr>
-                                <th>Password Id</th>
-                                <th>Site name</th>
-                                <th>Site password</th>
-                                <th>Site Username</th>
-                                <th>Button</th>
-                                <th>Button</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.rows.map((listValue, index) => {
-                                return (
-                                    <tr key={index}>
-                                        <td>{listValue.pwdId}</td>
-                                        <td>{listValue.siteName}</td>
-                                        <td>{listValue.sitePwd}</td>
-                                        <td>{listValue.siteUserName}</td>
-                                        <td>
-                                            <button> <Link to={{ pathname: "/editRecord", state: { item: listValue , id: this.state.userName} }}>Edit Record</Link></button>
-                                        </td>
-                                        <td>
-                                            <button onClick={context.handleItemDeleted.bind(context, index)}> Delete </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                <div className="titleBody">
+                    Here You Can &nbsp;
+                    <div className="dropping-texts">
+                        <div>View All Records</div>
+                        <div>Edit Your Records</div>
+                        <div>Add Your Records</div>
+                        <div>Delete Your Records!</div>
+                    </div>
                 </div>
 
 
-            </div>
+                <div className="center1">
+                    <h1>View Records</h1>
+
+
+
+                    <form>
+
+
+                        <table className="fl-table">
+                            <thead>
+                                <tr>
+                                    <td>
+                                        <button className="Addbutton"> <Link to={{ pathname: "/newRecord", state: { id: this.state.userName } }}>Add Record</Link></button>
+                                    </td>
+                                    <td>
+                                        <button className="logoutButton"> <Link to="/" onClick={() => { sessionStorage.clear() }} >Logout</Link> </button>
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <th>Password Id</th>
+                                    <th>Site name</th>
+                                    <th>Site password</th>
+                                    <th>Site Username</th>
+                                    <th>Edit Button</th>
+                                    <th>Delete Button</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.state.rows.map((listValue, index) => {
+                                    return (
+                                        <tr key={index}>
+                                            <td>{listValue.pwdId}</td>
+                                            <td>{listValue.siteName}</td>
+                                            <td>{listValue.sitePwd}</td>
+                                            <td>{listValue.siteUserName}</td>
+                                            <td>
+                                                <button> <Link to={{ pathname: "/editRecord", state: { item: listValue, id: this.state.userName } }}>Edit Record</Link></button>
+                                            </td>
+                                            <td>
+                                                <button onClick={context.handleItemDeleted.bind(context, index)}> Delete </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+
+                    </form>
+
+                </div>
+            </>
         );
     }
 

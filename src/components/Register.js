@@ -3,7 +3,7 @@ import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
 import { register } from "./Constants";
 import Spinner from 'react-bootstrap/Spinner';
-import loading from'../assets/loading.gif';
+import loading from '../assets/loading.gif';
 
 export default class Register extends Component {
   constructor(props) {
@@ -106,7 +106,7 @@ export default class Register extends Component {
     // userpin 4-6
 
     this.setState({ isLoading: true });
-    
+
     const authJson = {
 
       firstName: this.state.fields.firstName,
@@ -118,7 +118,7 @@ export default class Register extends Component {
     };
 
     console.log("data gone to api-", authJson);
-   
+
     // alert("Spinner chalu--"+this.state.isLoading);
     Axios.request({
       method: "POST",
@@ -128,7 +128,7 @@ export default class Register extends Component {
       .then((response) => {
 
         alert("User Authentication Successful.")
-        
+
         // localStorage.setItem("username",this.state.fields.username)
         // localStorage.setItem("token",response.data.jwttoken);
         // localStorage.setItem("logintime",response.data.loginTime);
@@ -162,82 +162,111 @@ export default class Register extends Component {
 
 
 
-      <div>
-        <div className="login">
-          <h1>Password Manager</h1>
-          <h1>Register Here</h1>
-          <p><input
-            id="firstName"
-            name="firstName"
-            type="text"
-            placeholder="firstName"
-            onKeyUp={this.handleChange}
-            required
-            maxLength="8"
-          /></p>
-          <p><input
-            id="lastName"
-            name="lastName"
-            type="text"
-            placeholder="lastName"
-            onKeyUp={this.handleChange}
-            required
-            maxLength="8"
-          /></p>
-          <p><input
-            id="emailId"
-            name="emailId"
-            type="text"
-            placeholder="email"
-            onKeyUp={this.handleChange}
-            required
-            maxLength="8"
-          /></p>
 
-          <p><input
+      <div className="center">
+
+        <h1>Register Here</h1>
+
+        <form>
+          <div className="txt_field">
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+
+              onKeyUp={this.handleChange}
+              required
+              maxLength="8"
+            />
+            <span></span>
+            <label> Your firstName </label>
+          </div>
+          <div className="txt_field">
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+
+              onKeyUp={this.handleChange}
+              required
+              maxLength="8"
+            />
+            <span></span>
+            <label> Your lastName </label>
+          </div>
+          <div className="txt_field">
+            <input
+              id="emailId"
+              name="emailId"
+              type="text"
+
+              onKeyUp={this.handleChange}
+              required
+              maxLength="8"
+            />
+            <span></span>
+            <label> Your email </label>
+          </div>
+
+          <div className="txt_field"><input
             id="userName"
             name="userName"
             type="text"
-            placeholder="userName"
+
             onKeyUp={this.handleChange}
             required
             maxLength="8"
-          /></p>
-          <p><input
+          />
+            <span></span>
+            <label> Your userName </label>
+          </div>
+          <div className="txt_field"><input
             id="userPass"
             name="userPass"
             type="text"
-            placeholder="userPass"
+
             onKeyUp={this.handleChange}
             required
             maxLength="8"
-          /></p>
-          <p><input
+          />
+            <span></span>
+            <label> Your userPass </label>
+          </div>
+          <div className="txt_field"><input
             id="userPin"
             name="userPin"
             type="text"
-            placeholder="userPin"
+
             onKeyUp={this.handleChange}
             required
             maxLength="8"
-          /></p>
+          />
+            <span></span>
+            <label> Your userPass </label>
+          </div>
 
-          <p className="submit"> <button
+          <button
             role="button"
             className="button"
             //onClick={this.authenticate}
             onClick={this.submitLoginForm}
           >
             Register
-                        </button></p>
+                        </button>
+          <div className="sigup_link">
+            <Link to="/" onClick={() => { sessionStorage.clear() }} >
+              <span> Logout</span>
+            </Link>
+          </div>
 
-                        {this.state.isLoading && <img src={loading} />  }
-        </div>
 
+          {this.state.isLoading && <img src={loading} />}
 
-       
-
+        </form>
       </div>
+
+
+
     );
   }
 }
